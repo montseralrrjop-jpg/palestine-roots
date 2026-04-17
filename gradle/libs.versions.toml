@@ -1,5 +1,5 @@
 [versions]
-agp = "8.13.2"
+agp = "8.2.2"
 kotlin = "1.9.22"
 core-ktx = "1.12.0"
 junit = "4.13.2"
@@ -8,12 +8,9 @@ espresso-core = "3.5.1"
 lifecycle-runtime-ktx = "2.7.0"
 activity-compose = "1.8.2"
 compose-bom = "2023.10.01"
-google-services = "4.4.1"
-firebase-bom = "32.7.2"
 navigation-compose = "2.7.7"
 maps-compose = "4.3.3"
 play-services-maps = "18.2.0"
-play-services-auth = "21.1.1"
 coil-compose = "2.6.0"
 datastore-preferences = "1.0.0"
 room = "2.6.1"
@@ -25,6 +22,7 @@ mockk = "1.13.10"
 hilt = "2.51.1"
 hilt-navigation-compose = "1.2.0"
 maps-compose-utils = "4.3.3"
+lottie-compose = "6.1.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "core-ktx" }
@@ -52,13 +50,6 @@ androidx-hilt-navigation-compose = { group = "androidx.hilt", name = "hilt-navig
 mockk = { group = "io.mockk", name = "mockk", version.ref = "mockk" }
 mockk-android = { group = "io.mockk", name = "mockk-android", version.ref = "mockk" }
 
-# Firebase
-firebase-bom = { group = "com.google.firebase", name = "firebase-bom", version.ref = "firebase-bom" }
-firebase-analytics-ktx = { group = "com.google.firebase", name = "firebase-analytics-ktx" }
-firebase-auth-ktx = { group = "com.google.firebase", name = "firebase-auth-ktx" }
-firebase-firestore-ktx = { group = "com.google.firebase", name = "firebase-firestore-ktx" }
-play-services-auth = { group = "com.google.android.gms", name = "play-services-auth", version.ref = "play-services-auth" }
-
 # Navigation
 androidx-navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "navigation-compose" }
 
@@ -82,6 +73,5 @@ maps-compose-utils = { group = "com.google.maps.android", name = "maps-compose-u
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
-google-services = { id = "com.google.gms.google-services", version.ref = "google-services" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 hilt = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }

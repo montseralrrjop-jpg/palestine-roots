@@ -17,16 +17,16 @@ interface SiteDao {
     @Query("SELECT * FROM sites")
     fun getAllSites(): Flow<List<SiteEntity>>
 
-    @Query("SELECT * FROM sites WHERE city = :cityName")
+    @Query("SELECT * FROM sites WHERE city = :cityName OR cityEn = :cityName")
     fun getSitesByCity(cityName: String): Flow<List<SiteEntity>>
 
     @Query("SELECT * FROM sites WHERE id = :siteId")
     suspend fun getSiteById(siteId: String): SiteEntity?
 
-    @Query("SELECT * FROM sites WHERE name LIKE '%' || :query || '%' OR description LIKE '%' || :query || '%'")
+    @Query("SELECT * FROM sites WHERE name LIKE '%' || :query || '%' OR description LIKE '%' || :query || '%' OR nameEn LIKE '%' || :query || '%' OR descriptionEn LIKE '%' || :query || '%' OR city LIKE '%' || :query || '%' OR cityEn LIKE '%' || :query || '%'")
     fun searchSites(query: String): Flow<List<SiteEntity>>
 
-    @Query("SELECT * FROM sites WHERE category = :category")
+    @Query("SELECT * FROM sites WHERE category = :category OR categoryEn = :category")
     fun getSitesByCategory(category: String): Flow<List<SiteEntity>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)

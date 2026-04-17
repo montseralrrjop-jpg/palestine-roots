@@ -16,19 +16,20 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.compose.ui.platform.LocalContext
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.palestine.roots.domain.model.Site
 import com.palestine.roots.ui.states.SiteUiState
 import com.palestine.roots.viewmodel.HomeViewModel
-
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
@@ -40,18 +41,25 @@ fun HomeScreen(
     onSiteSelected: (Site) -> Unit,
     onNavigateToMap: () -> Unit,
     onNavigateToFavorites: () -> Unit,
-    viewModel: HomeViewModel = viewModel()
+    viewModel: HomeViewModel
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val searchQuery by viewModel.searchQuery.collectAsState()
     val isDarkMode by viewModel.isDarkMode.collectAsState()
     val language by viewModel.language.collectAsState()
+    var selectedProvince by remember { mutableStateOf("") }
 
     Scaffold(
         topBar = {
             Column(modifier = Modifier.background(MaterialTheme.colorScheme.primary)) {
                 TopAppBar(
-                    title = { Text(stringResource(R.string.app_name), color = Color.White, fontWeight = FontWeight.Bold) },
+                    title = {
+                        Text(
+                            stringResource(R.string.app_name),
+                            color = Color.White,
+                            fontWeight = FontWeight.Bold
+                        )
+                    },
                     actions = {
                         IconButton(onClick = onNavigateToMap) {
                             Icon(Icons.Default.Map, stringResource(R.string.nav_map), tint = Color.White)
@@ -59,7 +67,7 @@ fun HomeScreen(
                         IconButton(onClick = onNavigateToFavorites) {
                             Icon(Icons.Default.Favorite, stringResource(R.string.nav_favorites), tint = Color.White)
                         }
-                        IconButton(onClick = { 
+                        IconButton(onClick = {
                             val nextLang = if (language == "ar") "en" else "ar"
                             viewModel.setLanguage(nextLang)
                         }) {
@@ -79,11 +87,13 @@ fun HomeScreen(
                     },
                     colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.primary)
                 )
-                // شريط البحث الذكي
                 SearchBar(
                     query = searchQuery,
-                    onQueryChange = { viewModel.onSearchQueryChanged(it) },
-                    modifier = Modifier.padding(16.dp)
+                    onQueryChange = {
+                        viewModel.onSearchQueryChanged(it)
+                        selectedProvince = ""
+                    },
+                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp)
                 )
             }
         }
@@ -94,14 +104,16 @@ fun HomeScreen(
                 .padding(padding)
                 .background(MaterialTheme.colorScheme.background)
         ) {
-            // فلتر المحافظات
             ProvinceFilter(
                 provinces = viewModel.provinces,
-                onProvinceSelected = { viewModel.filterByCity(it) },
+                selectedProvince = selectedProvince,
+                onProvinceSelected = { province ->
+                    selectedProvince = province
+                    viewModel.filterByCity(province)
+                },
                 language = language
             )
 
-            // عرض النتائج بناءً على الحالة
             when (val state = uiState) {
                 is SiteUiState.Loading -> {
                     SiteList(
@@ -140,10 +152,23 @@ fun SearchBar(
         onValueChange = onQueryChange,
         modifier = modifier
             .fillMaxWidth()
-            .height(56.dp)
-            .clip(RoundedCornerShape(28.dp)),
+            .height(52.dp)
+            .clip(RoundedCornerShape(26.dp)),
         placeholder = { Text(stringResource(R.string.search_hint)) },
-        leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
+        leadingIcon = {
+            Icon(
+                Icons.Default.Search,
+                contentDescription = null,
+                tint = Color.Gray
+            )
+        },
+        trailingIcon = {
+            if (query.isNotEmpty()) {
+                IconButton(onClick = { onQueryChange("") }) {
+                    Icon(Icons.Default.Clear, contentDescription = null, tint = Color.Gray)
+                }
+            }
+        },
         colors = TextFieldDefaults.colors(
             focusedContainerColor = Color.White,
             unfocusedContainerColor = Color.White,
@@ -155,33 +180,34 @@ fun SearchBar(
     )
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProvinceFilter(
     provinces: List<String>,
+    selectedProvince: String,
     onProvinceSelected: (String) -> Unit,
     language: String = "ar"
 ) {
     val translatedProvinces = if (language == "en") {
-        listOf(
-            "Jerusalem", "Ramallah", "Nablus", "Jenin", 
-            "Tulkarm", "Qalqilya", "Salfit", "Jericho", 
-            "Hebron", "Bethlehem"
-        )
+        listOf("Jerusalem", "Ramallah", "Nablus", "Jenin", "Tulkarm", "Qalqilya", "Salfit", "Jericho", "Hebron", "Bethlehem")
     } else {
         provinces
     }
 
     LazyRow(
-        modifier = Modifier.padding(vertical = 12.dp),
+        modifier = Modifier.padding(vertical = 8.dp),
         contentPadding = PaddingValues(horizontal = 16.dp),
         horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         items(translatedProvinces.size) { index ->
+            val isSelected = selectedProvince == provinces[index]
             FilterChip(
-                selected = false,
+                selected = isSelected,
                 onClick = { onProvinceSelected(provinces[index]) },
-                label = { Text(translatedProvinces[index]) }
+                label = { Text(translatedProvinces[index]) },
+                colors = FilterChipDefaults.filterChipColors(
+                    selectedContainerColor = MaterialTheme.colorScheme.primary,
+                    selectedLabelColor = Color.White
+                )
             )
         }
     }
@@ -199,19 +225,17 @@ fun SiteList(
         LazyVerticalGrid(
             columns = GridCells.Fixed(2),
             contentPadding = PaddingValues(16.dp),
-            horizontalArrangement = Arrangement.spacedBy(16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            items(6) {
-                SkeletonSiteCard()
-            }
+            items(6) { SkeletonSiteCard() }
         }
     } else {
         LazyVerticalGrid(
             columns = GridCells.Fixed(2),
             contentPadding = PaddingValues(16.dp),
-            horizontalArrangement = Arrangement.spacedBy(16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             items(sites) { site ->
                 SiteCard(site, onSiteSelected, onToggleFavorite, language)
@@ -224,32 +248,20 @@ fun SiteList(
 fun SkeletonSiteCard() {
     Card(
         shape = RoundedCornerShape(16.dp),
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(4.dp),
+        modifier = Modifier.fillMaxWidth().padding(2.dp),
         elevation = CardDefaults.cardElevation(2.dp)
     ) {
         Column {
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(120.dp)
+                    .height(130.dp)
                     .background(Color.LightGray.copy(alpha = 0.3f))
             )
             Column(modifier = Modifier.padding(12.dp)) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth(0.8f)
-                        .height(14.dp)
-                        .background(Color.LightGray.copy(alpha = 0.3f))
-                )
-                Spacer(modifier = Modifier.height(8.dp))
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth(0.5f)
-                        .height(12.dp)
-                        .background(Color.LightGray.copy(alpha = 0.3f))
-                )
+                Box(modifier = Modifier.fillMaxWidth(0.8f).height(14.dp).background(Color.LightGray.copy(alpha = 0.3f)))
+                Spacer(modifier = Modifier.height(6.dp))
+                Box(modifier = Modifier.fillMaxWidth(0.5f).height(10.dp).background(Color.LightGray.copy(alpha = 0.3f)))
             }
         }
     }
@@ -271,9 +283,7 @@ fun SiteCard(
     Card(
         onClick = { onSiteSelected(site) },
         shape = RoundedCornerShape(16.dp),
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(4.dp), // تحسين حجم اللمس
+        modifier = Modifier.fillMaxWidth().padding(2.dp),
         elevation = CardDefaults.cardElevation(4.dp)
     ) {
         Column {
@@ -283,56 +293,85 @@ fun SiteCard(
                         .data(site.imageUrl)
                         .crossfade(true)
                         .build(),
-                    contentDescription = name, // إمكانية الوصول
+                    contentDescription = name,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(120.dp),
+                        .height(130.dp),
                     contentScale = ContentScale.Crop
                 )
-                IconButton(
-                    onClick = { 
-                        haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                        onToggleFavorite(site) 
-                    },
+                // تدرج لوني على الصورة لتحسين قراءة النص
+                Box(
                     modifier = Modifier
-                        .align(Alignment.TopEnd)
-                        .size(48.dp) // حجم لمس معياري
+                        .fillMaxWidth()
+                        .height(50.dp)
+                        .align(Alignment.BottomCenter)
+                        .background(
+                            Brush.verticalGradient(
+                                colors = listOf(Color.Transparent, Color.Black.copy(alpha = 0.5f))
+                            )
+                        )
+                )
+                // شارة التصنيف
+                Surface(
+                    modifier = Modifier
+                        .align(Alignment.BottomStart)
+                        .padding(8.dp),
+                    color = MaterialTheme.colorScheme.primary.copy(alpha = 0.9f),
+                    shape = RoundedCornerShape(8.dp)
+                ) {
+                    Text(
+                        text = category,
+                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp),
+                        fontSize = 9.sp,
+                        color = Color.White,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+                // زر المفضلة
+                IconButton(
+                    onClick = {
+                        haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                        onToggleFavorite(site)
+                    },
+                    modifier = Modifier.align(Alignment.TopEnd).size(40.dp)
                 ) {
                     Icon(
                         imageVector = if (site.isFavorite) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
-                        contentDescription = if (site.isFavorite) "Remove from favorites" else "Add to favorites",
-                        tint = if (site.isFavorite) Color.Red else Color.White
+                        contentDescription = null,
+                        tint = if (site.isFavorite) Color.Red else Color.White,
+                        modifier = Modifier
+                            .background(Color.Black.copy(alpha = 0.3f), RoundedCornerShape(50))
+                            .padding(4.dp)
                     )
                 }
             }
-            Column(modifier = Modifier.padding(12.dp)) {
+            Column(modifier = Modifier.padding(10.dp)) {
                 Text(
-                    text = name, 
-                    fontWeight = FontWeight.Bold, 
-                    fontSize = 14.sp, 
+                    text = name,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 13.sp,
                     maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
                     color = MaterialTheme.colorScheme.onSurface
                 )
-                Text(
-                    text = city, 
-                    fontSize = 12.sp, 
-                    color = MaterialTheme.colorScheme.primary,
-                    fontWeight = FontWeight.Medium
-                )
-                Text(
-                    text = category,
-                    fontSize = 10.sp, 
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
+                Spacer(modifier = Modifier.height(2.dp))
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(
+                        Icons.Default.LocationOn,
+                        contentDescription = null,
+                        modifier = Modifier.size(12.dp),
+                        tint = MaterialTheme.colorScheme.primary
+                    )
+                    Spacer(modifier = Modifier.width(2.dp))
+                    Text(
+                        text = city,
+                        fontSize = 11.sp,
+                        color = MaterialTheme.colorScheme.primary,
+                        fontWeight = FontWeight.Medium
+                    )
+                }
             }
         }
-    }
-}
-
-@Composable
-fun LoadingState() {
-    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-        CircularProgressIndicator()
     }
 }
 
@@ -343,14 +382,25 @@ fun EmptyState() {
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Icon(Icons.Default.SearchOff, null, modifier = Modifier.size(64.dp), tint = Color.Gray)
-        Text(stringResource(R.string.no_results), color = Color.Gray)
+        Icon(
+            Icons.Default.SearchOff,
+            null,
+            modifier = Modifier.size(80.dp),
+            tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.5f)
+        )
+        Spacer(modifier = Modifier.height(16.dp))
+        Text(
+            stringResource(R.string.no_results),
+            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
+            fontSize = 16.sp,
+            fontWeight = FontWeight.Medium
+        )
     }
 }
 
 @Composable
 fun ErrorState(message: String) {
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-        Text("خطأ: $message", color = Color.Red)
+        Text("Error: $message", color = MaterialTheme.colorScheme.error)
     }
 }

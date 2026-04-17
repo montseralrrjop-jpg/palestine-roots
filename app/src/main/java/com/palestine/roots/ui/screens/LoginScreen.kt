@@ -1,154 +1,161 @@
 package com.palestine.roots.ui.screens
 
-import android.app.Activity
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.*
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccountCircle
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.draw.shadow
-import com.google.android.gms.auth.api.signin.GoogleSignIn
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions
-import com.google.android.gms.common.api.ApiException
-import com.google.firebase.auth.GoogleAuthProvider
-import com.google.firebase.auth.FirebaseAuth
 import com.palestine.roots.R
+import androidx.compose.ui.res.stringResource
 
 @Composable
 fun LoginScreen(
     onLoginSuccess: () -> Unit,
     onLoginError: (String) -> Unit
 ) {
-    val context = LocalContext.current
-    val auth = FirebaseAuth.getInstance()
-    
-    // ألوان تراثية
+    // ألوان تراثية فلسطينية
     val earthBrown = Color(0xFF8B7355)
-    
-    var isLoading by remember { mutableStateOf(false) }
-    
-    // إعداد Google Sign-In
-    val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-        .requestIdToken(context.getString(R.string.default_web_client_id))
-        .requestEmail()
-        .build()
-    
-    val googleSignInClient = remember { GoogleSignIn.getClient(context, gso) }
-    
-    // Launcher للتعامل مع نتيجة تسجيل الدخول
-    val launcher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.StartActivityForResult()
-    ) { result ->
-        if (result.resultCode == Activity.RESULT_OK) {
-            val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
-            try {
-                val account = task.getResult(ApiException::class.java)
-                val credential = GoogleAuthProvider.getCredential(account.idToken, null)
-                auth.signInWithCredential(credential)
-                    .addOnCompleteListener { authTask ->
-                        isLoading = false
-                        if (authTask.isSuccessful) {
-                            onLoginSuccess()
-                        } else {
-                            // للتجربة المحلية إذا لم يكن هناك إنترنت أو إعدادات Firebase
-                            onLoginSuccess() 
-                        }
-                    }
-            } catch (e: ApiException) {
-                isLoading = false
-                // للتجربة المحلية
-                onLoginSuccess()
-            }
-        } else {
-            isLoading = false
-            // للتجربة المحلية
-            onLoginSuccess()
-        }
-    }
-    
+    val oliveGreen = Color(0xFF556B2F)
+    val embroideryRed = Color(0xFFA52A2A)
+    val sandBeige = Color(0xFFF5DEB3)
+
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(earthBrown)
-            .padding(24.dp),
-        contentAlignment = Alignment.Center
-    ) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center,
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text(
-                text = "أهلاً بك في جذور فلسطين",
-                fontSize = 24.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color.White,
-                modifier = Modifier.padding(bottom = 32.dp)
+            .background(
+                brush = Brush.verticalGradient(
+                    colors = listOf(earthBrown, oliveGreen)
+                )
             )
-            
-            // زر تسجيل الدخول بتصميم تراثي
+    ) {
+        // زخرفة خلفية
+        Box(
+            modifier = Modifier
+                .align(Alignment.TopEnd)
+                .offset(x = 50.dp, y = (-80).dp)
+                .size(250.dp)
+                .clip(CircleShape)
+                .background(embroideryRed.copy(alpha = 0.1f))
+        )
+        Box(
+            modifier = Modifier
+                .align(Alignment.BottomStart)
+                .offset(x = (-60).dp, y = 100.dp)
+                .size(200.dp)
+                .clip(CircleShape)
+                .background(oliveGreen.copy(alpha = 0.15f))
+        )
+
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(32.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            // شعار التطبيق
+            Surface(
+                modifier = Modifier.size(120.dp),
+                shape = CircleShape,
+                color = Color.White.copy(alpha = 0.15f),
+                border = BorderStroke(2.dp, Color.White.copy(alpha = 0.3f))
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Eco,
+                    contentDescription = null,
+                    modifier = Modifier
+                        .padding(24.dp)
+                        .fillMaxSize(),
+                    tint = Color.White
+                )
+            }
+
+            Spacer(modifier = Modifier.height(32.dp))
+
+            Text(
+                text = stringResource(R.string.app_name),
+                fontSize = 32.sp,
+                fontWeight = FontWeight.Bold,
+                color = Color.White
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Text(
+                text = stringResource(R.string.onboarding_desc),
+                fontSize = 15.sp,
+                color = Color.White.copy(alpha = 0.85f),
+                textAlign = TextAlign.Center,
+                lineHeight = 22.sp,
+                modifier = Modifier.padding(horizontal = 16.dp)
+            )
+
+            Spacer(modifier = Modifier.height(48.dp))
+
+            // زر الدخول كضيف
             Button(
-                onClick = {
-                    isLoading = true
-                    // محاكاة تسجيل الدخول للتجربة السريعة
-                    val signInIntent = googleSignInClient.signInIntent
-                    launcher.launch(signInIntent)
-                },
-                enabled = !isLoading,
+                onClick = { onLoginSuccess() },
                 colors = ButtonDefaults.buttonColors(
                     containerColor = Color.White,
                     contentColor = earthBrown
                 ),
-                shape = RoundedCornerShape(12.dp),
+                shape = RoundedCornerShape(16.dp),
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(56.dp)
-                    .shadow(8.dp, RoundedCornerShape(12.dp))
+                    .height(60.dp)
+                    .shadow(12.dp, RoundedCornerShape(16.dp))
             ) {
-                if (isLoading) {
-                    CircularProgressIndicator(
-                        modifier = Modifier.size(24.dp),
-                        color = earthBrown,
-                        strokeWidth = 2.dp
-                    )
-                } else {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.Center
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.AccountCircle,
-                            contentDescription = "Google",
-                            modifier = Modifier.size(24.dp),
-                            tint = earthBrown
-                        )
-                        Spacer(modifier = Modifier.width(12.dp))
-                        Text(
-                            text = "تسجيل الدخول عبر جوجل",
-                            fontSize = 16.sp,
-                            fontWeight = FontWeight.Medium
-                        )
-                    }
-                }
+                Icon(
+                    imageVector = Icons.Default.Explore,
+                    contentDescription = null,
+                    modifier = Modifier.size(24.dp),
+                    tint = oliveGreen
+                )
+                Spacer(modifier = Modifier.width(12.dp))
+                Text(
+                    text = stringResource(R.string.login_guest),
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold
+                )
             }
-            
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // شريط زخرفي مستوحى من التطريز
+            Box(
+                modifier = Modifier
+                    .height(3.dp)
+                    .fillMaxWidth(0.6f)
+                    .background(
+                        brush = Brush.horizontalGradient(
+                            colors = listOf(embroideryRed, sandBeige, embroideryRed)
+                        ),
+                        shape = RoundedCornerShape(2.dp)
+                    )
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
             Text(
-                text = "بالتسجيل، أنت توافق على حفظ بياناتك في قاعدة بيانات آمنة",
+                text = stringResource(R.string.login_privacy_note),
                 fontSize = 12.sp,
-                color = Color.White.copy(alpha = 0.7f),
-                modifier = Modifier.padding(top = 16.dp),
-                lineHeight = 16.sp
+                color = Color.White.copy(alpha = 0.6f),
+                textAlign = TextAlign.Center,
+                lineHeight = 18.sp
             )
         }
     }

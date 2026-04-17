@@ -1,8 +1,5 @@
 # ProGuard rules for Palestine Roots app
 
-# Opt-out of R8's full mode (can be safer for some reflection-heavy libraries)
-#-fullmode
-
 # Keep Compose related classes
 -keepclassmembers class * extends androidx.compose.ui.node.RootForTest { *; }
 
@@ -11,10 +8,6 @@
 -keep class * extends androidx.room.RoomDatabase { *; }
 -keep class * { @androidx.room.Dao *; }
 -keep class * { @androidx.room.Entity *; }
-
-# Keep Firebase related classes
--keep class com.google.firebase.** { *; }
--dontwarn com.google.firebase.**
 
 # Keep Coil related classes
 -keep class coil.** { *; }
@@ -27,6 +20,16 @@
     val handler;
 }
 
+# Keep Hilt
+-keep class dagger.hilt.** { *; }
+-keep class javax.inject.** { *; }
+-keep class * extends dagger.hilt.android.internal.managers.ViewComponentManager$FragmentContextWrapper { *; }
+
+# Keep Parcelable
+-keepclassmembers class * implements android.os.Parcelable {
+    public static final ** CREATOR;
+}
+
 # General Keep rules
 -keepattributes Signature, Exceptions, *Annotation*
 -keep public class * extends android.app.Application
@@ -34,9 +37,7 @@
 -keep public class * extends android.app.Service
 -keep public class * extends android.content.BroadcastReceiver
 -keep public class * extends android.content.ContentProvider
--keep public class * extends android.view.View {
-    public <init>(android.content.Context);
-    public <init>(android.content.Context, android.util.AttributeSet);
-    public <init>(android.content.Context, android.util.AttributeSet, int);
-    public void set*(...);
-}
+
+# Google Maps
+-keep class com.google.android.gms.maps.** { *; }
+-dontwarn com.google.android.gms.maps.**

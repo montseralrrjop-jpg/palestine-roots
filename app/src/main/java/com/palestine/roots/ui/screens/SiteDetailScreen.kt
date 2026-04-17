@@ -5,31 +5,26 @@ import android.net.Uri
 import androidx.compose.animation.*
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.filled.FavoriteBorder
-import androidx.compose.material.icons.filled.Share
-import androidx.compose.material.icons.filled.LocationOn
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
+import coil.request.ImageRequest
 import com.palestine.roots.domain.model.Site
 import com.palestine.roots.viewmodel.HomeViewModel
-
 import androidx.compose.ui.res.stringResource
 import com.palestine.roots.R
 
@@ -38,7 +33,7 @@ import com.palestine.roots.R
 fun SiteDetailScreen(
     site: Site,
     onBack: () -> Unit,
-    viewModel: HomeViewModel = viewModel()
+    viewModel: HomeViewModel
 ) {
     val context = LocalContext.current
     val favoriteSites by viewModel.favoriteSites.collectAsState()
@@ -54,12 +49,12 @@ fun SiteDetailScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(name, color = Color.White, fontWeight = FontWeight.Bold) },
+                title = { Text(name, color = Color.White, fontWeight = FontWeight.Bold, maxLines = 1) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(
                             Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = stringResource(R.string.retry_button), // Using generic back/retry for now
+                            contentDescription = stringResource(R.string.retry_button),
                             tint = Color.White
                         )
                     }
@@ -86,7 +81,7 @@ fun SiteDetailScreen(
                     IconButton(onClick = { viewModel.toggleFavorite(site) }) {
                         Icon(
                             imageVector = if (isFavorite) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
-                            contentDescription = if (isFavorite) "Remove from favorites" else "Add to favorites",
+                            contentDescription = null,
                             tint = if (isFavorite) Color.Red else Color.White
                         )
                     }
@@ -101,96 +96,208 @@ fun SiteDetailScreen(
                 .padding(padding)
                 .background(MaterialTheme.colorScheme.background)
         ) {
+            // صورة الموقع الرئيسية
             item {
-                AsyncImage(
-                    model = coil.request.ImageRequest.Builder(LocalContext.current)
-                        .data(site.imageUrl)
-                        .crossfade(true)
-                        .build(),
-                    contentDescription = name,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(300.dp),
-                    contentScale = ContentScale.Crop
-                )
-            }
-            item {
-                Column(modifier = Modifier.padding(16.dp)) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
+                Box {
+                    AsyncImage(
+                        model = ImageRequest.Builder(LocalContext.current)
+                            .data(site.imageUrl)
+                            .crossfade(true)
+                            .build(),
+                        contentDescription = name,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(280.dp),
+                        contentScale = ContentScale.Crop
+                    )
+                    // تدرج لوني في أسفل الصورة
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(80.dp)
+                            .align(Alignment.BottomCenter)
+                            .background(
+                                Brush.verticalGradient(
+                                    colors = listOf(Color.Transparent, MaterialTheme.colorScheme.background)
+                                )
+                            )
+                    )
+                    // شارة التصنيف فوق الصورة
+                    Surface(
+                        modifier = Modifier
+                            .align(Alignment.TopStart)
+                            .padding(16.dp),
+                        color = MaterialTheme.colorScheme.primary,
+                        shape = RoundedCornerShape(12.dp)
                     ) {
                         Text(
-                            text = name,
-                            fontSize = 24.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.primary
+                            text = category,
+                            modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
+                            fontSize = 12.sp,
+                            color = Color.White,
+                            fontWeight = FontWeight.Bold
                         )
-                        Surface(
-                            color = MaterialTheme.colorScheme.secondary.copy(alpha = 0.1f),
-                            shape = RoundedCornerShape(8.dp)
-                        ) {
-                            Text(
-                                text = category,
-                                modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
-                                fontSize = 12.sp,
-                                color = MaterialTheme.colorScheme.secondary
-                            )
-                        }
                     }
-                    
+                }
+            }
+
+            // معلومات الموقع الأساسية
+            item {
+                Column(modifier = Modifier.padding(horizontal = 20.dp)) {
                     Text(
-                        text = "${stringResource(R.string.history_label)} ${site.foundationYear}",
-                        fontSize = 14.sp,
-                        color = Color.Gray,
-                        modifier = Modifier.padding(top = 8.dp)
+                        text = name,
+                        fontSize = 26.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.primary
                     )
 
-                    Spacer(modifier = Modifier.height(16.dp))
+                    Spacer(modifier = Modifier.height(8.dp))
 
-                    Text(
-                        text = stringResource(R.string.description_label),
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.Bold
+                    // صف المعلومات
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        // المدينة
+                        InfoChip(
+                            icon = Icons.Default.LocationOn,
+                            text = city,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                        // سنة التأسيس
+                        InfoChip(
+                            icon = Icons.Default.CalendarToday,
+                            text = site.foundationYear,
+                            color = MaterialTheme.colorScheme.secondary
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.height(20.dp))
+
+                    // فاصل زخرفي
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(2.dp)
+                            .background(
+                                brush = Brush.horizontalGradient(
+                                    colors = listOf(
+                                        MaterialTheme.colorScheme.primary,
+                                        MaterialTheme.colorScheme.tertiary,
+                                        MaterialTheme.colorScheme.primary
+                                    )
+                                ),
+                                shape = RoundedCornerShape(1.dp)
+                            )
+                    )
+
+                    Spacer(modifier = Modifier.height(20.dp))
+
+                    // الوصف
+                    SectionTitle(
+                        icon = Icons.Default.Description,
+                        title = stringResource(R.string.description_label)
                     )
                     Text(
                         text = description,
                         modifier = Modifier.padding(top = 8.dp),
-                        lineHeight = 24.sp
+                        lineHeight = 26.sp,
+                        fontSize = 15.sp,
+                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.85f)
                     )
 
                     Spacer(modifier = Modifier.height(24.dp))
 
-                    Text(
-                        text = stringResource(R.string.history_label),
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.Bold
+                    // التاريخ
+                    SectionTitle(
+                        icon = Icons.Default.History,
+                        title = stringResource(R.string.history_label)
                     )
                     Text(
                         text = history,
                         modifier = Modifier.padding(top = 8.dp),
-                        lineHeight = 24.sp
+                        lineHeight = 26.sp,
+                        fontSize = 15.sp,
+                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.85f)
                     )
 
-                    Spacer(modifier = Modifier.height(24.dp))
+                    Spacer(modifier = Modifier.height(32.dp))
 
+                    // زر خرائط جوجل
                     Button(
                         onClick = {
                             val gmmIntentUri = Uri.parse("geo:${site.latitude},${site.longitude}?q=${site.latitude},${site.longitude}(${name})")
                             val mapIntent = Intent(Intent.ACTION_VIEW, gmmIntentUri)
                             mapIntent.setPackage("com.google.android.apps.maps")
-                            context.startActivity(mapIntent)
+                            try {
+                                context.startActivity(mapIntent)
+                            } catch (e: Exception) {
+                                // فتح في المتصفح إذا لم تكن خرائط جوجل مثبتة
+                                val webUri = Uri.parse("https://www.google.com/maps/search/?api=1&query=${site.latitude},${site.longitude}")
+                                context.startActivity(Intent(Intent.ACTION_VIEW, webUri))
+                            }
                         },
                         modifier = Modifier.fillMaxWidth(),
-                        shape = RoundedCornerShape(12.dp)
+                        shape = RoundedCornerShape(14.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = MaterialTheme.colorScheme.primary
+                        )
                     ) {
-                        Icon(Icons.Default.LocationOn, contentDescription = null)
+                        Icon(Icons.Default.Navigation, contentDescription = null)
                         Spacer(modifier = Modifier.width(8.dp))
-                        Text(stringResource(R.string.google_maps_label))
+                        Text(
+                            stringResource(R.string.google_maps_label),
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 16.sp
+                        )
                     }
+
+                    Spacer(modifier = Modifier.height(24.dp))
                 }
             }
         }
+    }
+}
+
+@Composable
+fun InfoChip(
+    icon: androidx.compose.ui.graphics.vector.ImageVector,
+    text: String,
+    color: Color
+) {
+    Surface(
+        color = color.copy(alpha = 0.1f),
+        shape = RoundedCornerShape(10.dp)
+    ) {
+        Row(
+            modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(icon, contentDescription = null, modifier = Modifier.size(16.dp), tint = color)
+            Spacer(modifier = Modifier.width(4.dp))
+            Text(text = text, fontSize = 12.sp, color = color, fontWeight = FontWeight.Medium)
+        }
+    }
+}
+
+@Composable
+fun SectionTitle(
+    icon: androidx.compose.ui.graphics.vector.ImageVector,
+    title: String
+) {
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        Icon(
+            icon,
+            contentDescription = null,
+            modifier = Modifier.size(20.dp),
+            tint = MaterialTheme.colorScheme.primary
+        )
+        Spacer(modifier = Modifier.width(8.dp))
+        Text(
+            text = title,
+            fontSize = 18.sp,
+            fontWeight = FontWeight.Bold,
+            color = MaterialTheme.colorScheme.primary
+        )
     }
 }

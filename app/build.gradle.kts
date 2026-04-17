@@ -3,7 +3,6 @@ import java.util.Properties
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
-    alias(libs.plugins.google.services)
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt)
     id("kotlin-parcelize")
@@ -88,20 +87,13 @@ dependencies {
     ksp(libs.hilt.compiler)
     implementation(libs.androidx.hilt.navigation.compose)
 
-    // Firebase
-    implementation(platform(libs.firebase.bom))
-    implementation(libs.firebase.analytics.ktx)
-    implementation(libs.firebase.auth.ktx)
-    implementation(libs.firebase.firestore.ktx)
-    implementation(libs.play.services.auth) // Google Auth
-
     // Navigation
     implementation(libs.androidx.navigation.compose)
 
     // Maps
     implementation(libs.play.services.maps)
     implementation(libs.maps.compose)
-    implementation(libs.maps.compose.utils) // إضافة مكتبة الأدوات للخرائط (Clustering)
+    implementation(libs.maps.compose.utils)
 
     // Image Loading
     implementation(libs.coil.compose)
@@ -119,8 +111,8 @@ dependencies {
 
     // Testing
     testImplementation(libs.junit)
-    testImplementation(libs.kotlinx.coroutines.test) // لاختبار الكوروتين
-    testImplementation(libs.turbine) // لاختبار الـ Flow
+    testImplementation(libs.kotlinx.coroutines.test)
+    testImplementation(libs.turbine)
     testImplementation(libs.mockk)
     androidTestImplementation(libs.mockk.android)
     androidTestImplementation(libs.androidx.junit)
