@@ -1,3 +1,27 @@
+# مشروع Android — تعليمات الرفع إلى GitHub
+
+خطوات سريعة لرفع المشروع إلى GitHub بعد تثبيت Git على جهازك:
+
+1. ثبت Git من: https://git-scm.com/download/win
+2. افتح PowerShell في مجلد المشروع:
+
+```powershell
+cd "c:\Users\monts\Documents\trae_projects\1"
+git init
+git add .
+git commit -m "Initial commit"
+git branch -M main
+git remote add origin https://github.com/USERNAME/REPO.git
+git push -u origin main
+```
+
+ملاحظات أمان مهمة:
+- لا تشارك توكن الوصول الشخصي (PAT) في محادثات عامة. إذا نُشر توكن سابقاً، قم فوراً بإلغائه من GitHub → Settings → Developer settings → Personal access tokens.
+- لا تضع التوكن في رابط `remote`؛ استخدم مصادقة آمنة أو `gh auth login`.
+
+إذا تريد، أستطيع:
+- إنشاء الريبو على GitHub نيابةً عنك إذا زودتني بتوكن جديد بصورة آمنة، أو
+- إرشادك خطوة-بـخطوة عبر الـ PowerShell لإتمام العملية محلياً.
 # جذور فلسطين (Palestine Roots) 🇵🇸
 
 تطبيق "جذور فلسطين" هو منصة رقمية متطورة تهدف إلى توثيق وحماية التراث المعماري والتاريخي الفلسطيني. يتيح التطبيق للمستخدمين استكشاف المواقع الأثرية، المساجد، الكنائس، والبيوت القديمة عبر تجربة تفاعلية حديثة.
