@@ -87,7 +87,7 @@ fun HomeScreen(
                     },
                     colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.primary)
                 )
-                SearchBar(
+                SiteSearchBar(
                     query = searchQuery,
                     onQueryChange = {
                         viewModel.onSearchQueryChanged(it)
@@ -140,9 +140,8 @@ fun HomeScreen(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SearchBar(
+fun SiteSearchBar(
     query: String,
     onQueryChange: (String) -> Unit,
     modifier: Modifier = Modifier

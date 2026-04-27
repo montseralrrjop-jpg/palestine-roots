@@ -1,10 +1,11 @@
 ## Gradle
 .gradle/
 /build/
-/**/build/
+**/build/
 
 # Local configuration
 local.properties
+keystore.properties
 
 # IntelliJ
 .idea/
@@ -16,14 +17,17 @@ local.properties
 # Kotlin
 .kotlin/
 
-# Generated files
-/app/build/
-/build/
-
-# Keystore
+# Keystore files
 *.jks
-
-# Misc
-.DS_Store
-.log
 *.keystore
+
+# Google Services (Firebase - removed)
+google-services.json
+
+# OS files
+.DS_Store
+*.log
+Thumbs.db
+
+# Secrets
+*.env

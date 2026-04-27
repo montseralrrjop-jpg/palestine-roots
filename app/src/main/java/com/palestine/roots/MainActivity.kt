@@ -50,15 +50,15 @@ class MainActivity : ComponentActivity() {
         }
     }
 
+    @Suppress("DEPRECATION")
     private fun updateLocale(language: String) {
         val locale = Locale(language)
         Locale.setDefault(locale)
         val config = resources.configuration
         config.setLocale(locale)
+        // updateConfiguration deprecated but still needed for API < 25
+        // For API 25+ AppCompatDelegate.setApplicationLocales() is preferred
         resources.updateConfiguration(config, resources.displayMetrics)
-        
-        // لإعادة بناء النشاط وتطبيق تغيير اللغة فوراً (اختياري، يفضل استخدام CompositionLocal للغة)
-        // recreate()
     }
 }
 
@@ -81,8 +81,7 @@ fun PalestineRootsApp(homeViewModel: HomeViewModel, isOnboardingCompleted: Boole
                     } else {
                         navController.navigate("onboarding") { popUpTo("splash") { inclusive = true } }
                     }
-                },
-                onNavigateToHome = { navController.navigate("home") { popUpTo("splash") { inclusive = true } } }
+                }
             )
         }
 

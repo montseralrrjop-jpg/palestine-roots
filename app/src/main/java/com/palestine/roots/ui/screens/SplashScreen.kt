@@ -23,8 +23,7 @@ import kotlinx.coroutines.delay
 
 @Composable
 fun SplashScreen(
-    onNavigateToLogin: () -> Unit,
-    onNavigateToHome: () -> Unit
+    onNavigateToLogin: () -> Unit
 ) {
     val earthBrown = Color(0xFF8B7355)
     val oliveGreen = Color(0xFF556B2F)
