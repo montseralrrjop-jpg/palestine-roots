@@ -12,8 +12,9 @@ import com.google.gson.reflect.TypeToken
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
-@Database(entities = [SiteEntity::class], version = 2, exportSchema = false)
+@Database(entities = [SiteEntity::class], version = 3, exportSchema = false)
 abstract class PalestineDatabase : RoomDatabase() {
 
     abstract fun siteDao(): SiteDao
@@ -49,9 +50,17 @@ abstract class PalestineDatabase : RoomDatabase() {
             }
         }
 
+        override fun onOpen(db: SupportSQLiteDatabase) {
+            super.onOpen(db)
+            // Also check on open to ensure data is populated even if onCreate was missed
+            CoroutineScope(Dispatchers.IO).launch {
+                ensureDataPopulated()
+            }
+        }
+
         private suspend fun populateDatabase() {
-            val dao = getInstance(context).siteDao()
             try {
+                val dao = getInstance(context).siteDao()
                 val inputStream = context.assets.open("palestine_sites.json")
                 val size = inputStream.available()
                 val buffer = ByteArray(size)
@@ -62,6 +71,29 @@ abstract class PalestineDatabase : RoomDatabase() {
                 val type = object : TypeToken<List<SiteEntity>>() {}.type
                 val sites: List<SiteEntity> = Gson().fromJson(json, type)
                 dao.insertSites(sites)
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+
+        private suspend fun ensureDataPopulated() {
+            try {
+                val dao = getInstance(context).siteDao()
+                // Check if database is empty
+                val count = dao.getSiteCount()
+                if (count == 0) {
+                    // Database is empty, populate it
+                    val inputStream = context.assets.open("palestine_sites.json")
+                    val size = inputStream.available()
+                    val buffer = ByteArray(size)
+                    inputStream.read(buffer)
+                    inputStream.close()
+                    val json = String(buffer, Charsets.UTF_8)
+
+                    val type = object : TypeToken<List<SiteEntity>>() {}.type
+                    val sites: List<SiteEntity> = Gson().fromJson(json, type)
+                    dao.insertSites(sites)
+                }
             } catch (e: Exception) {
                 e.printStackTrace()
             }

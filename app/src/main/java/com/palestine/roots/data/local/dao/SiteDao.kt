@@ -30,4 +30,7 @@ interface SiteDao {
 
     @Query("SELECT * FROM sites WHERE is_favorite = 1 ORDER BY name ASC")
     fun getFavoriteSites(): Flow<List<SiteEntity>>
+
+    @Query("SELECT COUNT(*) FROM sites")
+    suspend fun getSiteCount(): Int
 }

@@ -2,7 +2,6 @@ package com.palestine.roots.ui
 
 import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import android.view.HapticFeedbackConstants
 import android.widget.ImageView
 import android.widget.TextView
@@ -31,23 +30,31 @@ class SiteAdapter(
 
     inner class SiteViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
-        private val ivSiteImage: ImageView = itemView.findViewById(R.id.imgSite)
-        private val tvCategory: TextView = itemView.findViewById(R.id.tvCategoryBadge)
-        private val ivFavorite: ImageView = itemView.findViewById(R.id.ibFavorite)
-        private val tvSiteName: TextView = itemView.findViewById(R.id.tvSiteName)
-        private val tvSiteCity: TextView = itemView.findViewById(R.id.tvSiteCity)
+        // IDs match the XML layout: item_site.xml
+        private val ivSiteImage: ImageView = itemView.findViewById(R.id.img_site)
+        private val tvCategory: TextView = itemView.findViewById(R.id.tv_category_badge)
+        private val ivFavorite: ImageView = itemView.findViewById(R.id.ib_favorite)
+        private val tvSiteName: TextView = itemView.findViewById(R.id.tv_site_name)
+        private val tvSiteCity: TextView = itemView.findViewById(R.id.tv_site_city)
 
         fun bind(site: Site) {
             tvSiteName.text = site.name
             tvSiteCity.text = site.city
             tvCategory.text = site.category
 
-            Glide.with(itemView.context)
-                .load(site.imageUrl)
-                .placeholder(R.drawable.placeholder_site)
-                .error(R.drawable.placeholder_site)
-                .centerCrop()
-                .into(ivSiteImage)
+            // Load image from assets
+            // Glide supports file:///android_asset/ URIs natively
+            val imageUri = site.imageUrl
+            try {
+                Glide.with(itemView.context)
+                    .load(imageUri)
+                    .placeholder(R.drawable.placeholder_site)
+                    .error(R.drawable.placeholder_site)
+                    .centerCrop()
+                    .into(ivSiteImage)
+            } catch (e: Exception) {
+                ivSiteImage.setImageResource(R.drawable.placeholder_site)
+            }
 
             ivFavorite.setImageResource(
                 if (site.isFavorite) R.drawable.ic_favorite_filled
