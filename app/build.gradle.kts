@@ -1,10 +1,10 @@
 import java.util.Properties
 
 plugins {
-    alias(libs.plugins.android.application)
-    alias(libs.plugins.kotlin.android)
-    alias(libs.plugins.ksp)
-    alias(libs.plugins.hilt)
+    id("com.android.application")
+    kotlin("android")
+    kotlin("kapt")
+    id("dagger.hilt.android.plugin")
     id("kotlin-parcelize")
 }
 
@@ -15,20 +15,15 @@ if (keystorePropertiesFile.exists()) {
 }
 
 android {
-    namespace = "com.palestine.roots"
-    compileSdk = 34
+    compileSdkVersion(33)
 
     defaultConfig {
         applicationId = "com.palestine.roots"
-        minSdk = 24
-        targetSdk = 34
+        minSdkVersion(24)
+        targetSdkVersion(33)
         versionCode = 1
         versionName = "1.0"
-
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        vectorDrawables {
-            useSupportLibrary = true
-        }
     }
 
     signingConfigs {
@@ -55,74 +50,58 @@ android {
             )
         }
     }
+
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
+        sourceCompatibility = JavaVersion.VERSION_1_8
+        targetCompatibility = JavaVersion.VERSION_1_8
     }
+
     kotlinOptions {
-        jvmTarget = "17"
+        jvmTarget = "1.8"
     }
+
     buildFeatures {
-        compose = true
-    }
-    composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.8"
-    }
-    packaging {
-        resources {
-            excludes += "/META-INF/{AL2.0,LGPL2.1}"
-        }
+        viewBinding = true
     }
 }
 
 dependencies {
-    implementation(libs.androidx.core.ktx)
-    implementation(libs.androidx.lifecycle.runtime.ktx)
-    implementation(libs.androidx.activity.compose)
-    implementation(platform(libs.androidx.compose.bom))
-    implementation(libs.androidx.ui)
-    implementation(libs.androidx.ui.graphics)
-    implementation(libs.androidx.ui.tooling.preview)
-    implementation(libs.androidx.material3)
-    implementation(libs.androidx.compose.material.icons.extended)
+    // AndroidX Core
+    implementation("androidx.core:core-ktx:1.7.0")
+    implementation("androidx.appcompat:appcompat:1.4.2")
+    implementation("com.google.android.material:material:1.6.1")
+    implementation("androidx.constraintlayout:constraintlayout:2.1.4")
+    implementation("androidx.cardview:cardview:1.0.0")
+    implementation("androidx.recyclerview:recyclerview:1.2.1")
+    implementation("androidx.viewpager2:viewpager2:1.0.0")
+
+    // Lifecycle
+    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.4.1")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.4.1")
+    implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.4.1")
 
     // Hilt
-    implementation(libs.hilt.android)
-    ksp(libs.hilt.compiler)
-    implementation(libs.androidx.hilt.navigation.compose)
+    implementation("com.google.dagger:hilt-android:2.38.1")
+    kapt("com.google.dagger:hilt-compiler:2.38.1")
 
-    // Navigation
-    implementation(libs.androidx.navigation.compose)
+    // Room
+    implementation("androidx.room:room-runtime:2.4.3")
+    implementation("androidx.room:room-ktx:2.4.3")
+    kapt("androidx.room:room-compiler:2.4.3")
 
-    // Maps
-    implementation(libs.play.services.maps)
-    implementation(libs.maps.compose)
-    implementation(libs.maps.compose.utils)
+    // DataStore
+    implementation("androidx.datastore:datastore-preferences:1.0.0")
 
-    // Image Loading
-    implementation(libs.coil.compose)
+    // Google Maps
+    implementation("com.google.android.gms:play-services-maps:18.0.2")
+    implementation("com.google.maps.android:maps-utils:2.3.0")
 
-    // Room Database
-    implementation(libs.androidx.room.runtime)
-    implementation(libs.androidx.room.ktx)
-    ksp(libs.androidx.room.compiler)
-
-    // Location
-    implementation(libs.play.services.location)
-
-    // Local Storage (DataStore)
-    implementation(libs.androidx.datastore.preferences)
+    // Glide - Image Loading
+    implementation("com.github.bumptech.glide:glide:4.12.0")
+    kapt("com.github.bumptech.glide:compiler:4.12.0")
 
     // Testing
-    testImplementation(libs.junit)
-    testImplementation(libs.kotlinx.coroutines.test)
-    testImplementation(libs.turbine)
-    testImplementation(libs.mockk)
-    androidTestImplementation(libs.mockk.android)
-    androidTestImplementation(libs.androidx.junit)
-    androidTestImplementation(libs.androidx.espresso.core)
-    androidTestImplementation(platform(libs.androidx.compose.bom))
-    androidTestImplementation(libs.androidx.ui.test.junit4)
-    debugImplementation(libs.androidx.ui.tooling)
-    debugImplementation(libs.androidx.ui.test.manifest)
+    testImplementation("junit:junit:4.13.2")
+    androidTestImplementation("androidx.test.ext:junit:1.1.3")
+    androidTestImplementation("androidx.test.espresso:espresso-core:3.4.0")
 }

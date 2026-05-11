@@ -6,12 +6,11 @@ import com.palestine.roots.domain.model.Site
 import com.palestine.roots.domain.repository.SiteRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import javax.inject.Inject
+import javax.inject.Singleton
 
-/**
- * تنفيذ مستودع البيانات (Repository Implementation).
- * يقوم بجلب البيانات من Room وتحويلها إلى كائنات Domain.
- */
-class SiteRepositoryImpl(
+@Singleton
+class SiteRepositoryImpl @Inject constructor(
     private val siteDao: SiteDao
 ) : SiteRepository {
 
@@ -21,8 +20,18 @@ class SiteRepositoryImpl(
         }
     }
 
-    override fun getSitesByCity(cityName: String): Flow<List<Site>> {
-        return siteDao.getSitesByCity(cityName).map { entities ->
+    override fun getSitesByCity(city: String): Flow<List<Site>> {
+        return siteDao.getSitesByCity("%$city%").map { entities ->
+            entities.map { it.toDomainModel() }
+        }
+    }
+
+    override suspend fun getSiteById(siteId: String): Site? {
+        return siteDao.getSiteById(siteId)?.toDomainModel()
+    }
+
+    override fun searchSites(query: String): Flow<List<Site>> {
+        return siteDao.searchSites("%$query%").map { entities ->
             entities.map { it.toDomainModel() }
         }
     }
@@ -31,16 +40,6 @@ class SiteRepositoryImpl(
         return siteDao.getFavoriteSites().map { entities ->
             entities.map { it.toDomainModel() }
         }
-    }
-
-    override fun searchSites(query: String): Flow<List<Site>> {
-        return siteDao.searchSites(query).map { entities ->
-            entities.map { it.toDomainModel() }
-        }
-    }
-
-    override suspend fun getSiteById(siteId: String): Site? {
-        return siteDao.getSiteById(siteId)?.toDomainModel()
     }
 
     override suspend fun toggleFavorite(siteId: String, isFavorite: Boolean) {

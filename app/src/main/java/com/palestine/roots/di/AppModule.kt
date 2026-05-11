@@ -19,11 +19,14 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideDatabase(@ApplicationContext context: Context): PalestineDatabase {
-        return PalestineDatabase.getDatabase(context)
+    fun providePalestineDatabase(
+        @ApplicationContext context: Context
+    ): PalestineDatabase {
+        return PalestineDatabase.getInstance(context)
     }
 
     @Provides
+    @Singleton
     fun provideSiteDao(database: PalestineDatabase): SiteDao {
         return database.siteDao()
     }
@@ -36,7 +39,9 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun providePreferencesManager(@ApplicationContext context: Context): PreferencesManager {
+    fun providePreferencesManager(
+        @ApplicationContext context: Context
+    ): PreferencesManager {
         return PreferencesManager(context)
     }
 }

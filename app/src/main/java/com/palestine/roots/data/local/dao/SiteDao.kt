@@ -7,34 +7,27 @@ import androidx.room.Query
 import com.palestine.roots.data.local.entity.SiteEntity
 import kotlinx.coroutines.flow.Flow
 
-/**
- * واجهة التعامل مع قاعدة البيانات (Data Access Object).
- * تحتوي على العمليات الأساسية لجلب والبحث وفلترة المواقع.
- */
 @Dao
 interface SiteDao {
 
-    @Query("SELECT * FROM sites")
+    @Query("SELECT * FROM sites ORDER BY name ASC")
     fun getAllSites(): Flow<List<SiteEntity>>
 
-    @Query("SELECT * FROM sites WHERE city LIKE '%' || :cityName || '%' OR cityEn LIKE '%' || :cityName || '%'")
-    fun getSitesByCity(cityName: String): Flow<List<SiteEntity>>
+    @Query("SELECT * FROM sites WHERE city LIKE :cityQuery ORDER BY name ASC")
+    fun getSitesByCity(cityQuery: String): Flow<List<SiteEntity>>
 
     @Query("SELECT * FROM sites WHERE id = :siteId")
     suspend fun getSiteById(siteId: String): SiteEntity?
 
-    @Query("SELECT * FROM sites WHERE name LIKE '%' || :query || '%' OR description LIKE '%' || :query || '%' OR nameEn LIKE '%' || :query || '%' OR descriptionEn LIKE '%' || :query || '%' OR city LIKE '%' || :query || '%' OR cityEn LIKE '%' || :query || '%'")
+    @Query("SELECT * FROM sites WHERE name LIKE :query OR name_en LIKE :query OR city LIKE :query OR city_en LIKE :query OR description LIKE :query OR description_en LIKE :query OR category LIKE :query OR category_en LIKE :query")
     fun searchSites(query: String): Flow<List<SiteEntity>>
-
-    @Query("SELECT * FROM sites WHERE category = :category OR categoryEn = :category")
-    fun getSitesByCategory(category: String): Flow<List<SiteEntity>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertSites(sites: List<SiteEntity>)
 
-    @Query("UPDATE sites SET isFavorite = :isFavorite WHERE id = :siteId")
+    @Query("UPDATE sites SET is_favorite = :isFavorite WHERE id = :siteId")
     suspend fun updateFavoriteStatus(siteId: String, isFavorite: Boolean)
 
-    @Query("SELECT * FROM sites WHERE isFavorite = 1")
+    @Query("SELECT * FROM sites WHERE is_favorite = 1 ORDER BY name ASC")
     fun getFavoriteSites(): Flow<List<SiteEntity>>
 }

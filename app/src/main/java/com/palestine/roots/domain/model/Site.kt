@@ -3,10 +3,6 @@ package com.palestine.roots.domain.model
 import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
 
-/**
- * نموذج البيانات الخاص بطبقة الـ Domain.
- * هذا هو الكائن الذي تتعامل معه واجهة المستخدم (UI).
- */
 @Parcelize
 data class Site(
     val id: String,
@@ -23,6 +19,6 @@ data class Site(
     val longitude: Double,
     val category: String,
     val categoryEn: String,
-    val foundationYear: String,
-    val isFavorite: Boolean
+    val foundationYear: String?,
+    val isFavorite: Boolean = false
 ) : Parcelable

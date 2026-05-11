@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.palestine.roots">
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
@@ -13,23 +14,47 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.PalestineRoots">
-        
+
+        <!-- Launcher -->
         <activity
-            android:name=".MainActivity"
+            android:name=".ui.SplashActivity"
             android:exported="true"
-            android:theme="@style/Theme.PalestineRoots">
+            android:theme="@style/Theme.PalestineRoots.Splash">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
 
-        <!-- Google Maps API Key - Replace with your own key -->
-        <!-- Get it from: https://console.cloud.google.com/apis/credentials -->
+        <activity
+            android:name=".ui.OnboardingActivity"
+            android:theme="@style/Theme.PalestineRoots" />
+
+        <activity
+            android:name=".ui.LoginActivity"
+            android:theme="@style/Theme.PalestineRoots" />
+
+        <activity
+            android:name=".ui.HomeActivity"
+            android:theme="@style/Theme.PalestineRoots" />
+
+        <activity
+            android:name=".ui.MapActivity"
+            android:theme="@style/Theme.PalestineRoots" />
+
+        <activity
+            android:name=".ui.FavoritesActivity"
+            android:theme="@style/Theme.PalestineRoots" />
+
+        <activity
+            android:name=".ui.DetailActivity"
+            android:theme="@style/Theme.PalestineRoots" />
+
+        <!-- Google Maps API Key -->
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="" />
-            
+
     </application>
 
 </manifest>
