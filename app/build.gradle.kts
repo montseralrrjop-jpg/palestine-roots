@@ -94,8 +94,8 @@ dependencies {
     implementation("androidx.datastore:datastore-preferences:1.0.0")
 
     // Google Maps
-    implementation("com.google.android.gms:play-services-maps:18.0.2")
-    implementation("com.google.maps.android:maps-utils:2.3.0")
+    implementation("com.google.android.gms:play-services-maps:17.0.1")
+    implementation("com.google.maps.android:maps-utils:2.2.3")
 
     // Glide - Image Loading
     implementation("com.github.bumptech.glide:glide:4.12.0")
