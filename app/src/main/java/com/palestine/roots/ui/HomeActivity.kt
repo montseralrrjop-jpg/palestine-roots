@@ -57,7 +57,7 @@ class HomeActivity : AppCompatActivity() {
     }
 
     private fun setupProvinceChips() {
-        val chipGroup = binding.chipGroupProvinces
+        val chipGroup = binding.cgProvinces
         chipGroup.removeAllViews()
 
         val allChip = Chip(this).apply {
@@ -101,20 +101,20 @@ class HomeActivity : AppCompatActivity() {
     }
 
     private fun setupToolbarActions() {
-        binding.ivMap.setOnClickListener {
+        binding.ibMap.setOnClickListener {
             startActivity(Intent(this, MapActivity::class.java))
         }
 
-        binding.ivFavorites.setOnClickListener {
+        binding.ibFavorites.setOnClickListener {
             startActivity(Intent(this, FavoritesActivity::class.java))
         }
 
-        binding.ivLanguage.setOnClickListener {
+        binding.ibLanguage.setOnClickListener {
             currentLang = if (currentLang == "ar") "en" else "ar"
             viewModel.setLanguage(currentLang)
         }
 
-        binding.ivDarkMode.setOnClickListener {
+        binding.ibDarkMode.setOnClickListener {
             lifecycleScope.launch {
                 val currentDarkMode = viewModel.isDarkMode.first()
                 val newMode = !currentDarkMode
@@ -125,6 +125,10 @@ class HomeActivity : AppCompatActivity() {
                 )
             }
         }
+
+        binding.fabMap.setOnClickListener {
+            startActivity(Intent(this, MapActivity::class.java))
+        }
     }
 
     private fun observeViewModel() {
@@ -132,16 +136,13 @@ class HomeActivity : AppCompatActivity() {
             viewModel.uiState.collectLatest { state ->
                 when (state) {
                     is HomeViewModel.UiState.Loading -> {
-                        binding.progressBar.visibility = View.VISIBLE
                         binding.rvSites.visibility = View.GONE
                     }
                     is HomeViewModel.UiState.Success -> {
-                        binding.progressBar.visibility = View.GONE
                         binding.rvSites.visibility = View.VISIBLE
                         siteAdapter.submitList(state.sites)
                     }
                     is HomeViewModel.UiState.Error -> {
-                        binding.progressBar.visibility = View.GONE
                         binding.rvSites.visibility = View.GONE
                     }
                 }
@@ -151,12 +152,6 @@ class HomeActivity : AppCompatActivity() {
         lifecycleScope.launch {
             viewModel.language.collectLatest { lang ->
                 currentLang = lang
-            }
-        }
-
-        lifecycleScope.launch {
-            viewModel.isDarkMode.collectLatest { isDark ->
-                // Dark mode state handled by AppCompatDelegate
             }
         }
     }

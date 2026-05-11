@@ -6,7 +6,6 @@ import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
-import com.palestine.roots.R
 import com.palestine.roots.databinding.ActivityFavoritesBinding
 import com.palestine.roots.viewmodel.HomeViewModel
 import dagger.hilt.android.AndroidEntryPoint
@@ -29,7 +28,7 @@ class FavoritesActivity : AppCompatActivity() {
         setupRecyclerView()
         observeFavorites()
 
-        binding.toolbar.setNavigationOnClickListener {
+        binding.toolbarFavorites.setNavigationOnClickListener {
             finish()
         }
     }
@@ -58,10 +57,10 @@ class FavoritesActivity : AppCompatActivity() {
                 siteAdapter.submitList(favorites)
                 if (favorites.isEmpty()) {
                     binding.rvFavorites.visibility = View.GONE
-                    binding.tvEmptyState.visibility = View.VISIBLE
+                    binding.llEmptyState.visibility = View.VISIBLE
                 } else {
                     binding.rvFavorites.visibility = View.VISIBLE
-                    binding.tvEmptyState.visibility = View.GONE
+                    binding.llEmptyState.visibility = View.GONE
                 }
             }
         }

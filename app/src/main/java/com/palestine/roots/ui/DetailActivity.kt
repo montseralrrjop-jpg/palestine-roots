@@ -42,12 +42,8 @@ class DetailActivity : AppCompatActivity() {
     }
 
     private fun setupToolbar() {
-        binding.toolbar.setNavigationOnClickListener {
+        binding.ibDetailBack.setOnClickListener {
             finish()
-        }
-
-        binding.ivShare.setOnClickListener {
-            shareSite()
         }
     }
 
@@ -70,16 +66,17 @@ class DetailActivity : AppCompatActivity() {
     }
 
     private fun displaySite(site: Site) {
-        binding.tvSiteName.text = site.name
-        binding.tvSiteCity.text = site.city
-        binding.tvDescription.text = site.description
-        binding.tvHistory.text = site.history
+        binding.tvDetailSiteName.text = site.name
+        binding.tvDetailCityChip.text = site.city
+        binding.tvDetailDescription.text = site.description
+        binding.tvDetailHistory.text = site.history
+        binding.tvDetailCategoryBadge.text = site.category
 
         if (site.foundationYear.isNullOrEmpty()) {
-            binding.chipFoundationYear.visibility = View.GONE
+            binding.tvDetailYearChip.visibility = View.GONE
         } else {
-            binding.chipFoundationYear.visibility = View.VISIBLE
-            binding.chipFoundationYear.text = site.foundationYear
+            binding.tvDetailYearChip.visibility = View.VISIBLE
+            binding.tvDetailYearChip.text = site.foundationYear
         }
 
         Glide.with(this)
@@ -87,24 +84,24 @@ class DetailActivity : AppCompatActivity() {
             .placeholder(R.drawable.placeholder_site)
             .error(R.drawable.placeholder_site)
             .centerCrop()
-            .into(binding.ivSiteImage)
+            .into(binding.imgDetailHero)
 
         updateFavoriteButton(site.isFavorite)
 
-        binding.ivFavorite.setOnClickListener {
+        binding.ibDetailFavorite.setOnClickListener {
             val newFavorite = !site.isFavorite
             viewModel.toggleFavorite(site.id, newFavorite)
             currentSite = site.copy(isFavorite = newFavorite)
             updateFavoriteButton(newFavorite)
         }
 
-        binding.btnOpenMap.setOnClickListener {
+        binding.btnOpenMaps.setOnClickListener {
             openInGoogleMaps(site)
         }
     }
 
     private fun updateFavoriteButton(isFavorite: Boolean) {
-        binding.ivFavorite.setImageResource(
+        binding.ibDetailFavorite.setImageResource(
             if (isFavorite) R.drawable.ic_favorite_filled
             else R.drawable.ic_favorite_border
         )
@@ -121,15 +118,5 @@ class DetailActivity : AppCompatActivity() {
             val webUri = "https://www.google.com/maps/search/?api=1&query=${site.latitude},${site.longitude}"
             startActivity(Intent(Intent.ACTION_VIEW, android.net.Uri.parse(webUri)))
         }
-    }
-
-    private fun shareSite() {
-        val site = currentSite ?: return
-        val shareText = "${site.name}\n${site.city}\n${site.description}"
-        val shareIntent = Intent(Intent.ACTION_SEND).apply {
-            type = "text/plain"
-            putExtra(Intent.EXTRA_TEXT, shareText)
-        }
-        startActivity(Intent.createChooser(shareIntent, "مشاركة الموقع"))
     }
 }

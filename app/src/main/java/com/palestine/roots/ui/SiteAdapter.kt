@@ -31,9 +31,9 @@ class SiteAdapter(
 
     inner class SiteViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
-        private val ivSiteImage: ImageView = itemView.findViewById(R.id.ivSiteImage)
-        private val tvCategory: TextView = itemView.findViewById(R.id.tvCategory)
-        private val ivFavorite: ImageView = itemView.findViewById(R.id.ivFavorite)
+        private val ivSiteImage: ImageView = itemView.findViewById(R.id.imgSite)
+        private val tvCategory: TextView = itemView.findViewById(R.id.tvCategoryBadge)
+        private val ivFavorite: ImageView = itemView.findViewById(R.id.ibFavorite)
         private val tvSiteName: TextView = itemView.findViewById(R.id.tvSiteName)
         private val tvSiteCity: TextView = itemView.findViewById(R.id.tvSiteCity)
 

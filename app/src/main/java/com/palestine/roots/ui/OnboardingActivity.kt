@@ -29,7 +29,7 @@ class OnboardingActivity : AppCompatActivity() {
             description = "تصفح المواقع على الخريطة التفاعلية واعثر على أقرب المعالم التاريخية إليك بسهولة."
         ),
         OnboardingPagerAdapter.OnboardingItem(
-            icon = R.drawable.ic_favorite,
+            icon = R.drawable.ic_favorite_filled,
             title = "المفضلة",
             description = "احفظ المواقع المفضلة لديك وعد إليها في أي وقت لتستكشفها وتشاركها مع الآخرين."
         )
@@ -40,8 +40,8 @@ class OnboardingActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         pagerAdapter = OnboardingPagerAdapter(onboardingItems)
-        binding.viewPager.adapter = pagerAdapter
-        binding.viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
+        binding.vpOnboarding.adapter = pagerAdapter
+        binding.vpOnboarding.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
             override fun onPageSelected(position: Int) {
                 updateDots(position)
                 updateButton(position)
@@ -52,10 +52,10 @@ class OnboardingActivity : AppCompatActivity() {
         updateDots(0)
         updateButton(0)
 
-        binding.btnNext.setOnClickListener {
-            val currentItem = binding.viewPager.currentItem
+        binding.btnOnboardingNext.setOnClickListener {
+            val currentItem = binding.vpOnboarding.currentItem
             if (currentItem < onboardingItems.size - 1) {
-                binding.viewPager.currentItem = currentItem + 1
+                binding.vpOnboarding.currentItem = currentItem + 1
             } else {
                 viewModel.completeOnboarding()
                 val intent = Intent(this, LoginActivity::class.java)
@@ -66,7 +66,7 @@ class OnboardingActivity : AppCompatActivity() {
     }
 
     private fun setupDots() {
-        val dotsLayout = binding.dotsLayout
+        val dotsLayout = binding.llDotsIndicator
         dotsLayout.removeAllViews()
         for (i in onboardingItems.indices) {
             val dot = android.view.View(this).apply {
@@ -75,14 +75,14 @@ class OnboardingActivity : AppCompatActivity() {
                     marginStart = 4
                     marginEnd = 4
                 }
-                setBackgroundResource(R.drawable.dot_indicator)
+                setBackgroundResource(R.drawable.bg_dot_unselected)
             }
             dotsLayout.addView(dot)
         }
     }
 
     private fun updateDots(position: Int) {
-        val dotsLayout = binding.dotsLayout
+        val dotsLayout = binding.llDotsIndicator
         for (i in 0 until dotsLayout.childCount) {
             val dot = dotsLayout.getChildAt(i)
             val size = if (i == position) 24 else 12
@@ -91,11 +91,12 @@ class OnboardingActivity : AppCompatActivity() {
                 marginEnd = 4
             }
             dot.isSelected = (i == position)
+            dot.setBackgroundResource(if (i == position) R.drawable.bg_dot_selected else R.drawable.bg_dot_unselected)
         }
     }
 
     private fun updateButton(position: Int) {
-        binding.btnNext.text = if (position == onboardingItems.size - 1) {
+        binding.btnOnboardingNext.text = if (position == onboardingItems.size - 1) {
             "ابدأ الآن"
         } else {
             "التالي"

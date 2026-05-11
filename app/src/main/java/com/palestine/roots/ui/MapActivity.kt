@@ -2,7 +2,6 @@ package com.palestine.roots.ui
 
 import android.content.Intent
 import android.os.Bundle
-import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -38,10 +37,14 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
 
-        val mapFragment = supportFragmentManager.findFragmentById(R.id.mapFragment) as SupportMapFragment
+        val mapFragment = supportFragmentManager.findFragmentById(R.id.fragmentMap) as SupportMapFragment
         mapFragment.getMapAsync(this)
 
-        binding.fabResetCamera.setOnClickListener {
+        binding.toolbarMap.setNavigationOnClickListener {
+            finish()
+        }
+
+        binding.fabMyLocation.setOnClickListener {
             googleMap?.animateCamera(CameraUpdateFactory.newLatLngZoom(JERUSALEM, DEFAULT_ZOOM))
         }
 

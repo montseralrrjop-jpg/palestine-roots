@@ -33,7 +33,7 @@ class OnboardingPagerAdapter(
 
     inner class OnboardingViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
-        private val ivIcon: ImageView = itemView.findViewById(R.id.ivOnboardingIcon)
+        private val ivIcon: ImageView = itemView.findViewById(R.id.imgOnboardingIcon)
         private val tvTitle: TextView = itemView.findViewById(R.id.tvOnboardingTitle)
         private val tvDescription: TextView = itemView.findViewById(R.id.tvOnboardingDescription)
 
