@@ -14,7 +14,7 @@ import kotlinx.coroutines.launch
 import org.json.JSONArray
 import java.nio.charset.Charset
 
-@Database(entities = [SiteEntity::class], version = 1, exportSchema = false)
+@Database(entities = [SiteEntity::class], version = 2, exportSchema = false)
 abstract class PalestineDatabase : RoomDatabase() {
 
     abstract fun siteDao(): SiteDao
@@ -30,6 +30,7 @@ abstract class PalestineDatabase : RoomDatabase() {
                     PalestineDatabase::class.java,
                     "palestine_roots_database"
                 )
+                .fallbackToDestructiveMigration()
                 .addCallback(object : RoomDatabase.Callback() {
                     override fun onCreate(db: SupportSQLiteDatabase) {
                         super.onCreate(db)

@@ -21,7 +21,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import coil.compose.AsyncImage
+import coil.compose.SubcomposeAsyncImage
 import coil.request.ImageRequest
 import com.palestine.roots.domain.model.Site
 import com.palestine.roots.viewmodel.HomeViewModel
@@ -99,7 +99,7 @@ fun SiteDetailScreen(
             // صورة الموقع الرئيسية
             item {
                 Box {
-                    AsyncImage(
+                    SubcomposeAsyncImage(
                         model = ImageRequest.Builder(LocalContext.current)
                             .data(site.imageUrl)
                             .crossfade(true)
@@ -108,7 +108,31 @@ fun SiteDetailScreen(
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(280.dp),
-                        contentScale = ContentScale.Crop
+                        contentScale = ContentScale.Crop,
+                        loading = {
+                            Box(
+                                modifier = Modifier.fillMaxSize().background(Color.LightGray.copy(alpha = 0.3f)),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                CircularProgressIndicator(
+                                    modifier = Modifier.size(32.dp),
+                                    color = MaterialTheme.colorScheme.primary
+                                )
+                            }
+                        },
+                        error = {
+                            Box(
+                                modifier = Modifier.fillMaxSize().background(Color.LightGray.copy(alpha = 0.2f)),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Icon(
+                                    Icons.Default.Landscape,
+                                    contentDescription = null,
+                                    modifier = Modifier.size(64.dp),
+                                    tint = Color.Gray.copy(alpha = 0.5f)
+                                )
+                            }
+                        }
                     )
                     // تدرج لوني في أسفل الصورة
                     Box(

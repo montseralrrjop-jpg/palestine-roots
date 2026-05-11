@@ -25,7 +25,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.platform.LocalContext
-import coil.compose.AsyncImage
+import coil.compose.SubcomposeAsyncImage
 import coil.request.ImageRequest
 import com.palestine.roots.domain.model.Site
 import com.palestine.roots.ui.states.SiteUiState
@@ -287,7 +287,7 @@ fun SiteCard(
     ) {
         Column {
             Box {
-                AsyncImage(
+                SubcomposeAsyncImage(
                     model = ImageRequest.Builder(LocalContext.current)
                         .data(site.imageUrl)
                         .crossfade(true)
@@ -296,7 +296,32 @@ fun SiteCard(
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(130.dp),
-                    contentScale = ContentScale.Crop
+                    contentScale = ContentScale.Crop,
+                    loading = {
+                        Box(
+                            modifier = Modifier.fillMaxSize().background(Color.LightGray.copy(alpha = 0.3f)),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            CircularProgressIndicator(
+                                modifier = Modifier.size(24.dp),
+                                strokeWidth = 2.dp,
+                                color = MaterialTheme.colorScheme.primary
+                            )
+                        }
+                    },
+                    error = {
+                        Box(
+                            modifier = Modifier.fillMaxSize().background(Color.LightGray.copy(alpha = 0.2f)),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Icon(
+                                Icons.Default.Landscape,
+                                contentDescription = null,
+                                modifier = Modifier.size(40.dp),
+                                tint = Color.Gray.copy(alpha = 0.5f)
+                            )
+                        }
+                    }
                 )
                 // تدرج لوني على الصورة لتحسين قراءة النص
                 Box(

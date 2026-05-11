@@ -17,7 +17,7 @@ interface SiteDao {
     @Query("SELECT * FROM sites")
     fun getAllSites(): Flow<List<SiteEntity>>
 
-    @Query("SELECT * FROM sites WHERE city = :cityName OR cityEn = :cityName")
+    @Query("SELECT * FROM sites WHERE city LIKE '%' || :cityName || '%' OR cityEn LIKE '%' || :cityName || '%'")
     fun getSitesByCity(cityName: String): Flow<List<SiteEntity>>
 
     @Query("SELECT * FROM sites WHERE id = :siteId")
