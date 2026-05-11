@@ -5,19 +5,25 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import androidx.appcompat.app.AppCompatActivity
+import androidx.activity.viewModels
 import androidx.lifecycle.lifecycleScope
+import com.palestine.roots.data.local.PreferencesManager
+import com.palestine.roots.data.local.db.PalestineDatabase
+import com.palestine.roots.data.repository.SiteRepositoryImpl
 import com.palestine.roots.databinding.ActivitySplashBinding
 import com.palestine.roots.viewmodel.HomeViewModel
-import dagger.hilt.android.AndroidEntryPoint
-import androidx.activity.viewModels
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
-@AndroidEntryPoint
 class SplashActivity : AppCompatActivity() {
 
     private val binding by lazy { ActivitySplashBinding.inflate(layoutInflater) }
-    private val viewModel: HomeViewModel by viewModels()
+    private val viewModel: HomeViewModel by viewModels {
+        val dao = PalestineDatabase.getInstance(this).siteDao()
+        val repo = SiteRepositoryImpl(dao)
+        val prefs = PreferencesManager(this)
+        HomeViewModel.Factory(repo, prefs)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

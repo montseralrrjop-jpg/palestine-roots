@@ -6,23 +6,29 @@ import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.widget.addTextChangedListener
+import androidx.activity.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import com.google.android.material.chip.Chip
 import com.palestine.roots.R
+import com.palestine.roots.data.local.PreferencesManager
+import com.palestine.roots.data.local.db.PalestineDatabase
+import com.palestine.roots.data.repository.SiteRepositoryImpl
 import com.palestine.roots.databinding.ActivityHomeBinding
 import com.palestine.roots.viewmodel.HomeViewModel
-import dagger.hilt.android.AndroidEntryPoint
-import androidx.activity.viewModels
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
-@AndroidEntryPoint
 class HomeActivity : AppCompatActivity() {
 
     private val binding by lazy { ActivityHomeBinding.inflate(layoutInflater) }
-    private val viewModel: HomeViewModel by viewModels()
+    private val viewModel: HomeViewModel by viewModels {
+        val dao = PalestineDatabase.getInstance(this).siteDao()
+        val repo = SiteRepositoryImpl(dao)
+        val prefs = PreferencesManager(this)
+        HomeViewModel.Factory(repo, prefs)
+    }
 
     private lateinit var siteAdapter: SiteAdapter
     private var currentLang = "ar"

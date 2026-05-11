@@ -6,11 +6,8 @@ import com.palestine.roots.domain.model.Site
 import com.palestine.roots.domain.repository.SiteRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
-import javax.inject.Inject
-import javax.inject.Singleton
 
-@Singleton
-class SiteRepositoryImpl @Inject constructor(
+class SiteRepositoryImpl(
     private val siteDao: SiteDao
 ) : SiteRepository {
 

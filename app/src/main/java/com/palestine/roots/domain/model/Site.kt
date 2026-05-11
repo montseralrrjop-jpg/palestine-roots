@@ -1,9 +1,7 @@
 package com.palestine.roots.domain.model
 
-import android.os.Parcelable
-import kotlinx.parcelize.Parcelize
+import java.io.Serializable
 
-@Parcelize
 data class Site(
     val id: String,
     val name: String,
@@ -21,4 +19,4 @@ data class Site(
     val categoryEn: String,
     val foundationYear: String?,
     val isFavorite: Boolean = false
-) : Parcelable
+) : Serializable

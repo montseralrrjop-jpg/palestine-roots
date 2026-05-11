@@ -3,17 +3,23 @@ package com.palestine.roots.ui
 import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.activity.viewModels
 import androidx.viewpager2.widget.ViewPager2
+import com.palestine.roots.data.local.PreferencesManager
+import com.palestine.roots.data.local.db.PalestineDatabase
+import com.palestine.roots.data.repository.SiteRepositoryImpl
 import com.palestine.roots.databinding.ActivityOnboardingBinding
 import com.palestine.roots.viewmodel.HomeViewModel
-import dagger.hilt.android.AndroidEntryPoint
-import androidx.activity.viewModels
 
-@AndroidEntryPoint
 class OnboardingActivity : AppCompatActivity() {
 
     private val binding by lazy { ActivityOnboardingBinding.inflate(layoutInflater) }
-    private val viewModel: HomeViewModel by viewModels()
+    private val viewModel: HomeViewModel by viewModels {
+        val dao = PalestineDatabase.getInstance(this).siteDao()
+        val repo = SiteRepositoryImpl(dao)
+        val prefs = PreferencesManager(this)
+        HomeViewModel.Factory(repo, prefs)
+    }
 
     private lateinit var pagerAdapter: OnboardingPagerAdapter
 

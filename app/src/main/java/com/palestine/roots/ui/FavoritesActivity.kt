@@ -4,20 +4,26 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
+import androidx.activity.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
+import com.palestine.roots.data.local.PreferencesManager
+import com.palestine.roots.data.local.db.PalestineDatabase
+import com.palestine.roots.data.repository.SiteRepositoryImpl
 import com.palestine.roots.databinding.ActivityFavoritesBinding
 import com.palestine.roots.viewmodel.HomeViewModel
-import dagger.hilt.android.AndroidEntryPoint
-import androidx.activity.viewModels
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
-@AndroidEntryPoint
 class FavoritesActivity : AppCompatActivity() {
 
     private val binding by lazy { ActivityFavoritesBinding.inflate(layoutInflater) }
-    private val viewModel: HomeViewModel by viewModels()
+    private val viewModel: HomeViewModel by viewModels {
+        val dao = PalestineDatabase.getInstance(this).siteDao()
+        val repo = SiteRepositoryImpl(dao)
+        val prefs = PreferencesManager(this)
+        HomeViewModel.Factory(repo, prefs)
+    }
 
     private lateinit var siteAdapter: SiteAdapter
 

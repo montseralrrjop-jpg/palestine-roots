@@ -5,21 +5,27 @@ import android.os.Bundle
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.activity.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
 import com.palestine.roots.R
+import com.palestine.roots.data.local.PreferencesManager
+import com.palestine.roots.data.local.db.PalestineDatabase
+import com.palestine.roots.data.repository.SiteRepositoryImpl
 import com.palestine.roots.databinding.ActivityDetailBinding
 import com.palestine.roots.domain.model.Site
 import com.palestine.roots.viewmodel.HomeViewModel
-import dagger.hilt.android.AndroidEntryPoint
-import androidx.activity.viewModels
 import kotlinx.coroutines.launch
 
-@AndroidEntryPoint
 class DetailActivity : AppCompatActivity() {
 
     private val binding by lazy { ActivityDetailBinding.inflate(layoutInflater) }
-    private val viewModel: HomeViewModel by viewModels()
+    private val viewModel: HomeViewModel by viewModels {
+        val dao = PalestineDatabase.getInstance(this).siteDao()
+        val repo = SiteRepositoryImpl(dao)
+        val prefs = PreferencesManager(this)
+        HomeViewModel.Factory(repo, prefs)
+    }
 
     private var currentSite: Site? = null
 

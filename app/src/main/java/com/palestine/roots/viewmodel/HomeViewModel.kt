@@ -1,22 +1,19 @@
 package com.palestine.roots.viewmodel
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.palestine.roots.data.local.PreferencesManager
 import com.palestine.roots.domain.model.Site
 import com.palestine.roots.domain.repository.SiteRepository
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
-@HiltViewModel
-class HomeViewModel @Inject constructor(
+class HomeViewModel(
     private val repository: SiteRepository,
     private val preferencesManager: PreferencesManager
 ) : ViewModel() {
@@ -127,5 +124,15 @@ class HomeViewModel @Inject constructor(
         object Loading : UiState()
         data class Success(val sites: List<Site>) : UiState()
         data class Error(val message: String) : UiState()
+    }
+
+    class Factory(
+        private val repository: SiteRepository,
+        private val preferencesManager: PreferencesManager
+    ) : ViewModelProvider.Factory {
+        @Suppress("UNCHECKED_CAST")
+        override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+            return HomeViewModel(repository, preferencesManager) as T
+        }
     }
 }
