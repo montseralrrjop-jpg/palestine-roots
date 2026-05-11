@@ -1,6 +1,6 @@
 // Top-level build file
 buildscript {
-    val kotlin_version = "1.6.21"
+    val kotlin_version = "1.5.32"
     repositories {
         google()
         mavenCentral()
